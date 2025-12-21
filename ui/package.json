@@ -5,6 +5,7 @@
   "dependencies": {
     "@craco/craco": "^7.1.0",
     "@google/generative-ai": "^0.24.1",
+    "@vapi-ai/web": "^2.5.2",
     "aos": "^2.3.4",
     "autoprefixer": "^10.4.16",
     "axios": "^1.12.2",

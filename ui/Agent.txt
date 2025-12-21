@@ -1,0 +1,92 @@
+import React, { useState, useEffect } from "react";
+import Vapi from "@vapi-ai/web";
+
+// Replace with your Vapi Public Key from .env file
+const VAPI_PUBLIC_KEY = process.env.REACT_APP_VAPI_KEY;
+
+// Initialize Vapi
+const vapi = new Vapi(VAPI_PUBLIC_KEY);
+
+const Agent = () => {
+  const [status, setStatus] = useState("Not started");
+  const [isCalling, setIsCalling] = useState(false);
+
+  // Function to start the interview call
+  const startInterview = () => {
+    // Replace with your Assistant ID from Vapi Dashboard
+    const ASSISTANT_ID = "c7f0fc21-71a5-4648-8119-a589fea45e61"; // 👈 Yahan apna Assistant ID daalein
+
+    if (!ASSISTANT_ID) {
+      alert("Please add your Assistant ID to the code.");
+      return;
+    }
+
+    setStatus("Connecting...");
+    vapi.start(ASSISTANT_ID);
+  };
+
+  // Function to stop the interview call
+  const stopInterview = () => {
+    vapi.stop();
+  };
+  
+  // Vapi events ko listen karne ke liye useEffect
+  useEffect(() => {
+    const handleCallStart = () => {
+      setStatus("Interview started... 🎤");
+      setIsCalling(true);
+    };
+
+    const handleCallEnd = () => {
+      setStatus("Interview ended ✅");
+      setIsCalling(false);
+    };
+
+    const handleError = (error) => {
+      console.error(error);
+      setStatus("Error starting interview ❌");
+      setIsCalling(false);
+    };
+
+    // Events ko listen karein
+    vapi.on("call-start", handleCallStart);
+    vapi.on("call-end", handleCallEnd);
+    vapi.on("error", handleError);
+
+    // Component unmount hone par events ko remove karein (clean-up)
+    return () => {
+      vapi.off("call-start", handleCallStart);
+      vapi.off("call-end", handleCallEnd);
+      vapi.off("error", handleError);
+    };
+  }, []); // Yeh effect sirf ek baar chalega
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
+      <div className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-md text-center">
+        <h1 className="text-3xl font-bold mb-6">🎙️ AI Interviewer</h1>
+        <p className="text-lg mb-6">
+          Status: <span className="font-semibold">{status}</span>
+        </p>
+        <div className="flex justify-center gap-4">
+          <button
+            onClick={startInterview}
+            disabled={isCalling} // Disable start button when call is active
+            className="px-6 py-2 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition disabled:bg-gray-400"
+          >
+            Start Interview
+          </button>
+          <button
+            onClick={stopInterview}
+            disabled={!isCalling} // Disable stop button when call is inactive
+            className="px-6 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition disabled:bg-gray-400"
+          >
+            Stop Interview
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Agent;

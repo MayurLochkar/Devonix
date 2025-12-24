@@ -1,22 +1,18 @@
 import React, { useState, useEffect, useRef } from "react";
-import Vapi from "@vapi-ai/web";
 import { Brain, User, Mic, MicOff, MessageSquare, Home } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import * as faceapi from "face-api.js";
 
-// Helper function for conditional classnames
+// Helper function
 const cn = (...classes) => classes.filter(Boolean).join(" ");
 
-// Vapi Public Key
-const VAPI_PUBLIC_KEY = process.env.REACT_APP_VAPI_KEY;
-
-// Initialize Vapi
-const vapi = new Vapi(VAPI_PUBLIC_KEY);
+const BACKEND_URL =
+  "https://interviewai-backend-production.up.railway.app";
 
 const Agent = () => {
   const [status, setStatus] = useState("Not started");
   const [isCalling, setIsCalling] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isSpeaking] = useState(false); // kept for UI consistency
   const [messages, setMessages] = useState([]);
   const transcriptEndRef = useRef(null);
   const navigate = useNavigate();
@@ -52,105 +48,87 @@ const Agent = () => {
       .catch(console.error);
   }, []);
 
-  // ✅ FINAL NERVOUS LOGIC (ONLY CHANGE)
-  // ✅ REAL-TIME NERVOUS DETECTION (WORKING)
-const prevExpRef = useRef(null);
+  // =============================
+  // REAL-TIME NERVOUS DETECTION
+  // =============================
+  const prevExpRef = useRef(null);
 
-useEffect(() => {
-  const interval = setInterval(async () => {
-    if (!videoRef.current) return;
-
-    const detection = await faceapi
-      .detectSingleFace(
-        videoRef.current,
-        new faceapi.TinyFaceDetectorOptions()
-      )
-      .withFaceExpressions();
-
-    if (!detection) return;
-
-    const exp = detection.expressions;
-
-    // First frame
-    if (!prevExpRef.current) {
-      prevExpRef.current = exp;
-      setEmotion("Calm 🙂");
-      return;
-    }
-
-    // Calculate expression change
-    const diff =
-      Math.abs(exp.happy - prevExpRef.current.happy) +
-      Math.abs(exp.fear - prevExpRef.current.fear) +
-      Math.abs(exp.sad - prevExpRef.current.sad) +
-      Math.abs(exp.angry - prevExpRef.current.angry);
-
-    prevExpRef.current = exp;
-
-    // 🔥 REALISTIC nervous threshold
-    if (diff > 0.25) {
-      setEmotion("Nervous 😰");
-    } else {
-      setEmotion("Calm 🙂");
-    }
-  }, 1200);
-
-  return () => clearInterval(interval);
-}, []);
-
-  // ✅ END CHANGE
-
-  // Start interview
-  const startInterview = () => {
-    setMessages([]);
-    const ASSISTANT_ID = "c7f0fc21-71a5-4648-8119-a589fea45e61";
-    setStatus("Connecting...");
-    vapi.start(ASSISTANT_ID);
-  };
-
-  // Stop interview
-  const stopInterview = () => {
-    vapi.stop();
-  };
-
-  // Vapi listeners
   useEffect(() => {
-    const handleCallStart = () => {
+    const interval = setInterval(async () => {
+      if (!videoRef.current) return;
+
+      const detection = await faceapi
+        .detectSingleFace(
+          videoRef.current,
+          new faceapi.TinyFaceDetectorOptions()
+        )
+        .withFaceExpressions();
+
+      if (!detection) return;
+
+      const exp = detection.expressions;
+
+      if (!prevExpRef.current) {
+        prevExpRef.current = exp;
+        setEmotion("Calm 🙂");
+        return;
+      }
+
+      const diff =
+        Math.abs(exp.happy - prevExpRef.current.happy) +
+        Math.abs(exp.fear - prevExpRef.current.fear) +
+        Math.abs(exp.sad - prevExpRef.current.sad) +
+        Math.abs(exp.angry - prevExpRef.current.angry);
+
+      prevExpRef.current = exp;
+
+      if (diff > 0.25) {
+        setEmotion("Nervous 😰");
+      } else {
+        setEmotion("Calm 🙂");
+      }
+    }, 1200);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // =============================
+  // INTERVIEW CONTROLS (BACKEND)
+  // =============================
+
+  const startInterview = async () => {
+    setMessages([]);
+    setStatus("Connecting...");
+
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/vapi/start`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!res.ok) throw new Error("Failed to start interview");
+
       setStatus("Interview in progress...");
       setIsCalling(true);
-    };
+    } catch (err) {
+      console.error(err);
+      setStatus("Failed to start interview ❌");
+    }
+  };
 
-    const handleCallEnd = () => {
-      setStatus("Interview ended ✅");
-      setIsCalling(false);
-    };
+  const stopInterview = () => {
+    setStatus("Interview ended ✅");
+    setIsCalling(false);
+  };
 
-    const handleSpeechStart = () => setIsSpeaking(true);
-    const handleSpeechEnd = () => setIsSpeaking(false);
-
-    const handleMessage = (message) => {
-      if (message.type === "transcript" && message.transcriptType === "final") {
-        setMessages((prev) => [
-          ...prev,
-          { role: message.role, content: message.transcript },
-        ]);
-      }
-    };
-
-    vapi.on("call-start", handleCallStart);
-    vapi.on("call-end", handleCallEnd);
-    vapi.on("speech-start", handleSpeechStart);
-    vapi.on("speech-end", handleSpeechEnd);
-    vapi.on("message", handleMessage);
-
-    return () => vapi.stop();
-  }, []);
+  // =============================
+  // UI
+  // =============================
 
   return (
     <div className="flex w-full h-screen bg-[#0f172a] text-white font-sans">
       {/* Main */}
       <div className="flex flex-col flex-grow items-center justify-center p-4">
-        {/* Title */}
         <div className="mb-12 text-center">
           <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
             AI Interviewer
@@ -170,7 +148,9 @@ useEffect(() => {
             >
               <Brain className="h-12 w-12 text-white" />
             </div>
-            <h2 className="text-2xl font-bold text-cyan-300">AI Interviewer</h2>
+            <h2 className="text-2xl font-bold text-cyan-300">
+              AI Interviewer
+            </h2>
           </div>
 
           {/* YOU */}
@@ -184,7 +164,9 @@ useEffect(() => {
             <h2 className="text-2xl font-bold text-cyan-300">You</h2>
             <p
               className={`text-sm font-semibold ${
-                emotion.includes("Nervous") ? "text-red-400" : "text-green-400"
+                emotion.includes("Nervous")
+                  ? "text-red-400"
+                  : "text-green-400"
               }`}
             >
               {emotion}
@@ -194,12 +176,20 @@ useEffect(() => {
 
         {/* Buttons */}
         <div className="mt-16 flex items-center gap-6 flex-wrap justify-center">
-          <button onClick={startInterview} disabled={isCalling} className="px-8 py-3 rounded-full bg-cyan-600">
+          <button
+            onClick={startInterview}
+            disabled={isCalling}
+            className="px-8 py-3 rounded-full bg-cyan-600"
+          >
             <Mic className="inline mr-2" />
             Start Interview
           </button>
 
-          <button onClick={stopInterview} disabled={!isCalling} className="px-8 py-3 rounded-full bg-red-600">
+          <button
+            onClick={stopInterview}
+            disabled={!isCalling}
+            className="px-8 py-3 rounded-full bg-red-600"
+          >
             <MicOff className="inline mr-2" />
             End Interview
           </button>
@@ -228,7 +218,9 @@ useEffect(() => {
 
         <div className="flex-grow p-4 overflow-y-auto space-y-4">
           {messages.map((msg, i) => (
-            <div key={i} className="text-sm">{msg.content}</div>
+            <div key={i} className="text-sm">
+              {msg.content}
+            </div>
           ))}
           <div ref={transcriptEndRef} />
         </div>

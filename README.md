@@ -1,64 +1,93 @@
 🚀 InterviewAI – AI-Powered Interview Preparation Platform
 
-InterviewAI is a full-stack AI-powered interview preparation platform designed to help students and job-seekers practice interviews, analyze resumes, and follow structured learning roadmaps — all in one place.
+InterviewAI is a full-stack, AI-powered interview preparation platform built to help students and job-seekers practice interviews, improve resumes, and follow structured learning roadmaps — all in one place.
 
-🎯 Built for hackathons with a strong focus on real-world usability, AI integration, and clean UI/UX.
+🎯 Designed especially for hackathons, InterviewAI focuses on real-world usability, AI integration, and a clean, modern UI/UX.
 
 🌐 Live Demo (MVP)
 
-👉 Live URL: 
-👉 GitHub Repo: 
+👉 Live URL: https://devonix-ui.vercel.app
+👉 GitHub Repository: (add your repo link here)
+
+⚠️ Note: Some advanced AI features are demonstrated via demo video due to third-party API and deployment limitations.
 
 🧠 Key Features
 🎤 AI Interviewer
 
 Real-time AI voice-based mock interviews
 
-Natural conversation flow using AI voice agent
+Natural, conversational interview flow
 
-Live transcript generation
+Live transcript generation during the interview
 
 Start / End interview controls
 
-User-friendly interviewer vs candidate UI
+Clear Interviewer vs Candidate UI layout
+
+Emotion awareness using facial expression detection (experimental)
 
 📄 AI Resume Analyzer
 
-Upload resume (PDF/DOC)
+Upload resumes in PDF / DOC format
 
-AI-generated summary and improvement suggestions
+AI-generated resume summary
 
-Interactive AI chat for resume & career guidance
+Personalized improvement suggestions
 
-Clean tab-based UI (Upload / Analysis / Chat)
+Interactive AI chat for:
+
+Resume guidance
+
+Career advice
+
+Clean, tab-based interface:
+
+Upload
+
+Analysis
+
+AI Chat
 
 🛣️ Learning Roadmaps
 
-DSA Roadmap (Beginner → Advanced)
+Structured learning paths for:
 
-Full-Stack Development Path
+DSA (Beginner → Advanced)
 
-Machine Learning & Python Backend Path
+Full-Stack Development
 
-Curated resources (Roadmaps, YouTube, Platforms, Tools, Projects)
+Machine Learning & Python Backend
+
+Curated resources including:
+
+Roadmaps
+
+YouTube channels
+
+Platforms & tools
+
+Project ideas
 
 🔐 Authentication (Firebase)
 
-Secure Sign In / Sign Up using Firebase Authentication
+Secure Sign In / Sign Up
 
-Auth context for protected routes
+Firebase Authentication integration
 
-No backend dependency for auth (hackathon friendly)
+Protected routes using Auth Context
+
+No backend dependency for authentication
+(Hackathon-friendly & scalable)
 
 ✨ UI & UX
 
-Modern dark-themed UI
+Modern dark-themed interface
 
-Smooth scroll animations using AOS
+Smooth animations using AOS (Animate on Scroll)
 
 Fully responsive design
 
-Component-based architecture
+Reusable, component-based architecture
 
 🛠️ Tech Stack
 Frontend
@@ -69,15 +98,31 @@ Tailwind CSS
 
 React Router
 
-AOS (Animate On Scroll)
+AOS (Animate on Scroll)
 
 Firebase Authentication
 
 AI & APIs
 
-Vapi AI (Voice Interview Agent)
+Vapi AI – Voice-based AI Interview Agent
 
-AI-powered Resume Analysis (API-based)
+AI Resume Analysis API
+
+Deployment & Tools
+
+GitHub – Version Control
+
+Vercel – Frontend Deployment
+
+🎯 Why InterviewAI?
+
+Solves a real problem faced by students & job-seekers
+
+Combines AI voice, resume analysis, and learning guidance
+
+Practical, scalable, and industry-aligned solution
+
+Built with a clear focus on user experience and innovation
 
 Deployment
 

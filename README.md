@@ -7,7 +7,7 @@ InterviewAI is a full-stack, AI-powered interview preparation platform built to 
 🌐 Live Demo (MVP)
 
 👉 Live URL: https://devonix-ui.vercel.app
-👉 GitHub Repository: (add your repo link here)
+
 
 ⚠️ Note: Some advanced AI features are demonstrated via demo video due to third-party API and deployment limitations.
 
